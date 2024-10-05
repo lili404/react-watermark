@@ -1,0 +1,15 @@
+.previewWrapper {
+  position: relative;
+}
+
+.imageCanvas,
+.overlayCanvas {
+  width: 100%;
+  height: auto;
+  max-height: 58.75rem;
+}
+.overlayCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
