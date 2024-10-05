@@ -4,8 +4,6 @@
   box-sizing: border-box;
 }
 
-html,
-#root,
 body {
-  height: 100%;
+  padding: 1rem;
 }

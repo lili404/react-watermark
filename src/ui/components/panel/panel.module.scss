@@ -1,6 +1,5 @@
 .panelWrapper {
-  width: 100%;
-  max-width: 24rem;
+  min-width: 16rem;
 }
 
 .form {
@@ -8,6 +7,6 @@
   padding-inline-start: 1rem;
 }
 
-.gapSliders {
+.slider {
   width: 100%;
 }

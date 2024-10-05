@@ -9,9 +9,6 @@ const Upload = ({setUploadedImage, setImageName, setImageType}) => {
     setUploadedImage(uploadedUrl);
     setImageName(file.name);
     setImageType(file.type);
-
-    // console.log(file.name);
-    // console.log(file.type);
   };
 
   const uploadProps = {

@@ -1,7 +1,6 @@
 import React from 'react';
 import {ColorPicker, Flex, Form, Input, Slider, Button} from 'antd';
 import styles from './panel.module.scss';
-import {useForm} from 'antd/es/form/Form';
 
 const Panel = ({
   config,
@@ -11,8 +10,6 @@ const Panel = ({
   imageName,
   imageType,
 }) => {
-  const [form] = useForm();
-
   const handleDownload = () => {
     const imageCanvas = imageCanvasRef.current;
     const overlayCanvas = overlayCanvasRef.current;
@@ -27,9 +24,6 @@ const Panel = ({
     combinedContext.drawImage(overlayCanvas, 0, 0);
 
     const link = document.createElement('a');
-
-    // console.log(imageName);
-    // console.log(imageType);
     link.href = combinedCanvas.toDataURL(imageType);
     link.download = `${imageName.split('.')[0]}-watermarked.${
       imageType.split('/')[1]
@@ -41,7 +35,6 @@ const Panel = ({
     <Flex className={styles.panelWrapper} gap="large" vertical>
       <Form
         className={styles.form}
-        form={form}
         layout="vertical"
         initialValues={config}
         onValuesChange={(_, values) => {
@@ -65,18 +58,10 @@ const Panel = ({
         </Form.Item>
         <Form.Item label="Gap">
           <Flex gap="middle">
-            <Form.Item
-              className={styles.gapSliders}
-              name={['gap', 0]}
-              label="X"
-            >
+            <Form.Item className={styles.slider} name={['gap', 0]} label="X">
               <Slider step={10} min={10} max={500} />
             </Form.Item>
-            <Form.Item
-              className={styles.gapSliders}
-              name={['gap', 1]}
-              label="Y"
-            >
+            <Form.Item className={styles.slider} name={['gap', 1]} label="Y">
               <Slider step={10} min={10} max={500} />
             </Form.Item>
           </Flex>
@@ -84,14 +69,14 @@ const Panel = ({
         <Form.Item label="Offset">
           <Flex gap="middle">
             <Form.Item
-              className={styles.gapSliders}
+              className={styles.slider}
               name={['translate', 0]}
               label="X"
             >
               <Slider step={10} min={-100} max={100} />
             </Form.Item>
             <Form.Item
-              className={styles.gapSliders}
+              className={styles.slider}
               name={['translate', 1]}
               label="Y"
             >

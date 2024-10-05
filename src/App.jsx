@@ -1,7 +1,8 @@
-import Wrapper from './ui/components/wrapper';
+import React from 'react';
+import WatermarkEditor from './ui/components/watermark-editor';
 
 function App() {
-  return <Wrapper />;
+  return <WatermarkEditor />;
 }
 
 export default App;
