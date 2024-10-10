@@ -1,14 +1,16 @@
 import React from 'react';
-import {ColorPicker, Flex, Form, Input, Slider, Button} from 'antd';
+import {Flex, Form, Slider, Button, Select} from 'antd';
 import styles from './panel.module.scss';
 
 const Panel = ({
-  config,
-  setConfig,
   imageCanvasRef,
   overlayCanvasRef,
   imageName,
   imageType,
+  setSelectedWatermark,
+  setSelectedPosition,
+  setWatermarkScale,
+  setWatermarkMargin,
 }) => {
   const handleDownload = () => {
     const imageCanvas = imageCanvasRef.current;
@@ -25,66 +27,71 @@ const Panel = ({
 
     const link = document.createElement('a');
     link.href = combinedCanvas.toDataURL(imageType);
-    link.download = `${imageName.split('.')[0]}-watermarked.${
-      imageType.split('/')[1]
-    }`;
+    link.download = `${imageName}-watermarked.${imageType}`;
+    console.log(imageName);
+    console.log(imageType);
     link.click();
   };
 
   return (
     <Flex className={styles.panelWrapper} gap="large" vertical>
-      <Form
-        className={styles.form}
-        layout="vertical"
-        initialValues={config}
-        onValuesChange={(_, values) => {
-          if (typeof values.color === 'object' && values.color !== null) {
-            values.color = values.color.toRgbString();
-          }
-          setConfig((prevConfig) => ({...prevConfig, ...values}));
-        }}
-      >
-        <Form.Item name="content" label="Watermark Text">
-          <Input placeholder="Input your watermark text" />
+      <Form className={styles.form}>
+        <Form.Item label="Watermark">
+          <Select
+            defaultValue="Floria"
+            style={{
+              width: 120,
+            }}
+            onChange={setSelectedWatermark}
+            options={[
+              {
+                value: 'floria.png',
+                label: 'Floria',
+              },
+              {
+                value: 'ksu.png',
+                label: 'KSU',
+              },
+            ]}
+          />
         </Form.Item>
-        <Form.Item name="color" label="Color">
-          <ColorPicker />
+
+        <Form.Item label="Position">
+          <Select
+            defaultValue="Top Left"
+            style={{
+              width: 120,
+            }}
+            onChange={setSelectedPosition}
+            options={[
+              {value: 'tl', label: 'Top Left'},
+              {value: 'tr', label: 'Top Right'},
+              {value: 'bl', label: 'Bottom Left'},
+              {value: 'br', label: 'Bottom Right'},
+            ]}
+          />
         </Form.Item>
-        <Form.Item name="fontSize" label="Font size">
-          <Slider step={1} min={1} max={100} />
+
+        <Form.Item label="Watermark scale">
+          <Slider
+            min={0.5}
+            max={3}
+            step={0.1}
+            defaultValue={1}
+            onChange={setWatermarkScale}
+          />
         </Form.Item>
-        <Form.Item name="rotate" label="Rotation">
-          <Slider step={1} min={-180} max={180} />
-        </Form.Item>
-        <Form.Item label="Gap">
-          <Flex gap="middle">
-            <Form.Item className={styles.slider} name={['gap', 0]} label="X">
-              <Slider step={10} min={10} max={500} />
-            </Form.Item>
-            <Form.Item className={styles.slider} name={['gap', 1]} label="Y">
-              <Slider step={10} min={10} max={500} />
-            </Form.Item>
-          </Flex>
-        </Form.Item>
-        <Form.Item label="Offset">
-          <Flex gap="middle">
-            <Form.Item
-              className={styles.slider}
-              name={['translate', 0]}
-              label="X"
-            >
-              <Slider step={10} min={-100} max={100} />
-            </Form.Item>
-            <Form.Item
-              className={styles.slider}
-              name={['translate', 1]}
-              label="Y"
-            >
-              <Slider step={10} min={-100} max={100} />
-            </Form.Item>
-          </Flex>
+        <Form.Item label="Watermark margin">
+          <Slider
+            min={0}
+            max={100}
+            step={10}
+            defaultValue={20}
+            onChange={setWatermarkMargin}
+          />
         </Form.Item>
       </Form>
+
       <Button type="primary" onClick={handleDownload}>
         Download
       </Button>

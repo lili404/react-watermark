@@ -5,25 +5,24 @@ import Upload from '../upload';
 import Panel from '../panel';
 
 const WatermarkEditor = () => {
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [imageName, setImageName] = useState('');
-  const [imageType, setImageType] = useState('');
+  const presetWatermarks = ['floria.png', 'ksu.png'];
 
-  const [config, setConfig] = useState({
-    content: 'awenko',
-    color: 'rgba(255, 255, 255, 0.5)',
-    fontSize: 32,
-    rotate: -30,
-    gap: [130, 150],
-    translate: [0, 0],
-  });
-
-  const {content, color, fontSize, rotate, gap, translate} = config;
+  const [baseImage, setBaseImage] = useState(null);
+  const [imageInfo, setImageInfo] = useState({name: 'result', type: 'png'});
 
   const imageCanvasRef = useRef(null);
   const overlayCanvasRef = useRef(null);
 
+  const [selectedWatermark, setSelectedWatermark] = useState(
+    presetWatermarks[0]
+  );
+  const [selectedPosition, setSelectedPosition] = useState('tl');
+  const [watermarkScale, setWatermarkScale] = useState(1);
+  const [watermarkMargin, setWatermarkMargin] = useState(0);
+
   useEffect(() => {
+    if (!baseImage) return;
+
     const imageCanvas = imageCanvasRef.current;
     const imageContext = imageCanvas.getContext('2d');
 
@@ -31,11 +30,11 @@ const WatermarkEditor = () => {
     const overlayContext = overlayCanvas.getContext('2d');
 
     const image = new Image();
-    image.src = uploadedImage;
+    image.src = baseImage;
 
     image.onload = () => {
-      imageCanvas.width = overlayCanvas.width = image.naturalWidth;
-      imageCanvas.height = overlayCanvas.height = image.naturalHeight;
+      imageCanvas.width = image.naturalWidth;
+      imageCanvas.height = image.naturalHeight;
 
       imageContext.drawImage(
         image,
@@ -44,44 +43,64 @@ const WatermarkEditor = () => {
         imageCanvas.width,
         imageCanvas.height
       );
-
-      overlayContext.font = `${config.fontSize}px Arial`;
-      overlayContext.fillStyle = config.color;
-      const [gapX, gapY] = gap;
-      const [translateX, translateY] = translate;
-
-      for (let x = -200; x < overlayCanvas.width + 200; x += gapX) {
-        for (let y = -200; y < overlayCanvas.height + 200; y += gapY) {
-          overlayContext.save();
-          overlayContext.translate(x + translateX, y + translateY);
-          overlayContext.rotate((config.rotate * Math.PI) / 180);
-          overlayContext.fillText(config.content, 0, 0);
-          overlayContext.restore();
-        }
-      }
     };
-  }, [uploadedImage, config]);
+  }, [baseImage]);
+
+  useEffect(() => {
+    if (!baseImage) return;
+
+    const overlayCanvas = overlayCanvasRef.current;
+    const overlayContext = overlayCanvas.getContext('2d');
+
+    const watermark = new Image();
+    watermark.src = selectedWatermark;
+
+    watermark.onload = () => {
+      overlayCanvas.width = imageCanvasRef.current.width;
+      overlayCanvas.height = imageCanvasRef.current.height;
+
+      const width = watermark.naturalWidth * watermarkScale;
+      const height = watermark.naturalHeight * watermarkScale;
+
+      const positions = {
+        tl: [watermarkMargin, watermarkMargin],
+        tr: [overlayCanvas.width - width - watermarkMargin, watermarkMargin],
+        bl: [watermarkMargin, overlayCanvas.height - height - watermarkMargin],
+        br: [
+          overlayCanvas.width - width - watermarkMargin,
+          overlayCanvas.height - height - watermarkMargin,
+        ],
+      };
+      const [x, y] = positions[selectedPosition];
+      overlayContext.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+      overlayContext.drawImage(watermark, x, y, width, height);
+    };
+  }, [
+    baseImage,
+    selectedPosition,
+    selectedWatermark,
+    watermarkScale,
+    watermarkMargin,
+  ]);
 
   return (
     <Flex className={styles.wrapper} vertical align="center" gap="large">
-      <Upload
-        setUploadedImage={setUploadedImage}
-        setImageName={setImageName}
-        setImageType={setImageType}
-      />
+      <Upload setUploadedImage={setBaseImage} setImageInfo={setImageInfo} />
       <Flex className={styles.editorWrapper} justify="center" gap="large">
         <div className={styles.previewWrapper}>
           <canvas ref={imageCanvasRef} className={styles.imageCanvas} />
           <canvas ref={overlayCanvasRef} className={styles.overlayCanvas} />
         </div>
-        {uploadedImage && (
+        {baseImage && (
           <Panel
-            config={config}
-            setConfig={setConfig}
             imageCanvasRef={imageCanvasRef}
             overlayCanvasRef={overlayCanvasRef}
-            imageName={imageName}
-            imageType={imageType}
+            imageName={imageInfo.name}
+            imageType={imageInfo.type}
+            setSelectedWatermark={setSelectedWatermark}
+            setSelectedPosition={setSelectedPosition}
+            setWatermarkScale={setWatermarkScale}
+            setWatermarkMargin={setWatermarkMargin}
           />
         )}
       </Flex>
