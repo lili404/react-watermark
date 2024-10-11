@@ -13,11 +13,13 @@ const Upload = ({uploadedImage, setUploadedImage, setImageInfo}) => {
       if (uploadedImage) {
         URL.revokeObjectURL(uploadedImage);
       }
+
       setUploadedImage(URL.createObjectURL(file));
       setImageInfo({
         name: file.name.split('.')[0],
         type: file.type.split('/')[1],
       });
+
       return false;
     },
   };
